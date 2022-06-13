@@ -1,4 +1,4 @@
-# best100-backend
+# best100-backend (정리중)
 ### GET : /best/top100 - 초기 페이지 베스트 top 100
 
 requestparam - sort: likeCnt, replyCnt
