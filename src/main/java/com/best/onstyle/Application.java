@@ -1,4 +1,4 @@
-package com.best.spring;
+package com.best.onstyle;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
