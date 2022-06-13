@@ -38,9 +38,8 @@ dependencies {
     implementation'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation'org.springframework.boot:spring-boot-starter-mustache'
     implementation'org.springframework.session:spring-session-jdbc'
+    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
     annotationProcessor('org.projectlombok:lombok')
-//    implementation 'org.springframework.boot:spring-boot-starter-security'
-//    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
     testAnnotationProcessor('org.projectlombok:lombok')
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
