@@ -21,4 +21,8 @@ public class BestApiController {
         return bestService.findBestTop100(sort);
     }
 
+    @GetMapping("/best/rankings/{itemInfoId}")
+    public List<BestItemRankingsResponseDto> findBestItemRankings(@PathVariable String itemInfoId) {
+        return bestService.findBestItemRankings(itemInfoId);
+    }
 }

@@ -48,6 +48,16 @@ public class BestService {
         }).collect(Collectors.toList());
     }
 
+    @Transactional
+    public List<BestItemRankingsResponseDto> findBestItemRankings(String itemInfoId) {
+        ItemInfo itemInfo = itemInfoRepository.findByItemInfoId(itemInfoId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품이 없습니다." + itemInfoId));
+
+        return bestRepository.findTop5ByItemInfoOrderByCurrentUpdateDesc(itemInfo).stream()
+                .map(BestItemRankingsResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
     private Sort getSortType(String sortType){
         if(sortType.equals("replyCnt")){
             return Sort.by(Sort.Direction.DESC, "countOfReplies");
