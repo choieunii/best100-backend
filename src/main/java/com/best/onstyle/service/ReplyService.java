@@ -70,4 +70,19 @@ public class ReplyService {
         return new ReplyTopResponseDto(likeTopReply, hateTopReply);
     }
 
+    @Transactional
+    public void updateReplyLikeCnt(Long id){
+        Reply reply = replyRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 한줄평이 없습니다. id=" + id));
+        reply.updateLikeCnt();
+        replyRepository.save(reply);
+    }
+
+    @Transactional
+    public void updateReplyHateCnt(Long id){
+        Reply reply = replyRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 한줄평이 없습니다. id=" + id));
+        reply.updateHateCnt();
+        replyRepository.save(reply);
+    }
 }

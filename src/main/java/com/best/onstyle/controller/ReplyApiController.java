@@ -45,5 +45,16 @@ public class ReplyApiController {
         return replyService.findTopLikeCntAndHateCnt(itemInfoId);
     }
 
+    @PostMapping("/reply/like/{replyId}")
+    public boolean updateLike(@PathVariable Long replyId) {
+        replyService.updateReplyLikeCnt(replyId);
+        return true;
+    }
+
+    @PostMapping("/reply/hate/{replyId}")
+    public boolean updateHate(@PathVariable Long replyId) {
+        replyService.updateReplyHateCnt(replyId);
+        return true;
+    }
 
 }
