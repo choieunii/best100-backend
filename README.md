@@ -40,7 +40,7 @@ sort param이 없을 경우 기본 랭킹 순 정렬
 ]
 ```
 
-### GET : /item/data - parsing 후 데이터 삽입
+### GET : /item/data - DB 데이터 
 
 ### GET : /item/{itemInfoId} - 상품 코드에 다른 아이템 정보
 
