@@ -12,4 +12,5 @@ public interface BestRepository extends JpaRepository<Best,Long> {
     List<Best> findAllByItemInfo(ItemInfo itemInfo);
     List<Best> findTop5ByItemInfoOrderByCurrentUpdateDesc(ItemInfo itemInfo);
     List<Best> findAllByCurrentUpdateBetween(Date start, Date end, Sort sort);
+    Optional<Best> findByItemInfoAndCurrentUpdateBetween(ItemInfo itemInfo, Date start, Date end);
 }

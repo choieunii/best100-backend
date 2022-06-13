@@ -28,7 +28,7 @@ public class BestService {
     @Transactional
     public List<BestTop100ResponseDto> findBestTop100(String sortType) {
         Date before = new Date();
-        before = new Date(before.getTime() + (1000 * 60 * 60 * 24 * -1));
+        before = new Date(before.getTime() + (1000 * 60 * 60 * 10 * -1));
 
         Sort sort;
         if(sortType == null){

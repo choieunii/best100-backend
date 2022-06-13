@@ -46,8 +46,13 @@ public class ItemInfoService {
         ItemInfo item = itemInfoRepository.findByItemInfoId(itemInfoId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품이 없습니다."));
 
+        Date before = new Date();
+        before = new Date(before.getTime() + (1000 * 60 * 60 * 10 * -1));
+
         List<Best> itemRankingList = bestRepository.findAllByItemInfo(item);
-        boolean isCurrentUpdate = itemRankingList.size() >= 1 ? false: true;
+        Optional<Best> todayUpdate = bestRepository.findByItemInfoAndCurrentUpdateBetween(item, before, new Date());
+
+        boolean isCurrentUpdate = itemRankingList.size() == 1 && todayUpdate.isPresent() ? true : false;
         return new ItemResponseDto(item, isCurrentUpdate);
     }
     @Transactional
