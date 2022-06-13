@@ -60,4 +60,14 @@ public class ReplyService {
         return true;
     }
 
+    @Transactional
+    public ReplyTopResponseDto findTopLikeCntAndHateCnt(String itemInfoId){
+        ItemInfo item = itemInfoRepository.findByItemInfoId(itemInfoId).get();
+        ReplyResponseDto likeTopReply = replyRepository.findTopByItemInfoOrderByLikeCntDesc(item)
+                .map(ReplyResponseDto::new).get();
+        ReplyResponseDto hateTopReply = replyRepository.findTopByItemInfoOrderByHateCntDesc(item)
+                .map(ReplyResponseDto::new).get();
+        return new ReplyTopResponseDto(likeTopReply, hateTopReply);
+    }
+
 }

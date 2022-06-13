@@ -40,5 +40,10 @@ public class ReplyApiController {
         return replyService.deleteReply(replyId);
     }
 
+    @GetMapping("/reply/top/{itemInfoId}")
+    public ReplyTopResponseDto findTopLikeCntAndHateCnt(@PathVariable String itemInfoId){
+        return replyService.findTopLikeCntAndHateCnt(itemInfoId);
+    }
+
 
 }
