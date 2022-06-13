@@ -53,7 +53,7 @@ public class ItemInfo {
             cascade = CascadeType.ALL,
             orphanRemoval = true,
             fetch = FetchType.LAZY)
-    @OrderBy("current_update desc")
+    @OrderBy("currentUpdate desc")
     private List<Best> bestList;
 
     @OneToMany(
@@ -61,7 +61,7 @@ public class ItemInfo {
             cascade = CascadeType.ALL,
             orphanRemoval = true,
             fetch = FetchType.LAZY)
-    @OrderBy("current_update desc")
+    @OrderBy("currentUpdate desc")
     private List<Reply> replyList;
 
     @OneToMany(
@@ -69,7 +69,7 @@ public class ItemInfo {
             cascade = CascadeType.ALL,
             orphanRemoval = true,
             fetch = FetchType.LAZY)
-    @OrderBy("current_update desc")
+    @OrderBy("currentUpdate desc")
     private List<Price> priceList;
 
     @Builder
