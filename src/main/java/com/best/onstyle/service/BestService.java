@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -39,12 +40,13 @@ public class BestService {
         List<Best> bestTop100 = bestRepository.findAllByCurrentUpdateBetween(before, new Date(), sort);
 
         return bestTop100.stream().map(best -> {
-            ReplyResponseDto likeTopReply = replyRepository.findTopByItemInfoOrderByLikeCntDesc(best)
-                    .map(ReplyResponseDto::new).get();
-            ReplyResponseDto hateTopReply = replyRepository.findTopByItemInfoOrderByHateCntDesc(best)
-                    .map(ReplyResponseDto::new).get();
-            BestTop100ResponseDto bestTop100ResponseDto = new BestTop100ResponseDto(best, likeTopReply, hateTopReply);
-            return bestTop100ResponseDto;
+            Optional<Reply> likeTopReply = replyRepository.findTopByItemInfoOrderByLikeCntDesc(best.getItemInfo());
+            Optional<Reply> hateTopReply = replyRepository.findTopByItemInfoOrderByHateCntDesc(best.getItemInfo());
+
+            ReplyResponseDto likeReplyResponseDto = likeTopReply.map(ReplyResponseDto::new).orElse(null);
+            ReplyResponseDto hateReplyResponseDto = hateTopReply.map(ReplyResponseDto::new).orElse(null);
+
+            return new BestTop100ResponseDto(best, likeReplyResponseDto, hateReplyResponseDto);
         }).collect(Collectors.toList());
     }
 

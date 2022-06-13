@@ -35,10 +35,10 @@ public class Best {
     private Date currentUpdate;
 
     @Formula("(select r.like_cnt from item_info r where r.item_info_id = item_info_id)")
-    private Integer countOfItemLikes;
+    private Long countOfItemLikes;
 
     @Formula("(select count(*) from reply r where r.item_info_id = item_info_id)")
-    private Integer countOfReplies;
+    private Long countOfReplies;
 
     @Builder
     public Best(ItemInfo itemInfo, Long ranking, Date currentUpdate){
