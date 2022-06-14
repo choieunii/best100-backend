@@ -1,9 +1,6 @@
 package com.best.onstyle.controller;
 
-import com.best.onstyle.dto.ReplyResponseDto;
-import com.best.onstyle.dto.ReplySaveRequestDto;
-import com.best.onstyle.dto.ReplyTopResponseDto;
-import com.best.onstyle.dto.ReplyUpdateRequestDto;
+import com.best.onstyle.dto.*;
 import com.best.onstyle.service.ReplyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -19,12 +16,16 @@ import java.util.List;
 public class ReplyApiController {
     private final ReplyService replyService;
 
-    @GetMapping("/reply/{itemInfoId}")
-    public List<ReplyResponseDto> findPagingReplyList(@PathVariable String itemInfoId,
-                                                      @PageableDefault(sort = "currentUpdate", direction = Sort.Direction.DESC, size = 10) Pageable pageable) {
-        return replyService.findPagingReplyList(itemInfoId, pageable).getContent();
+    @GetMapping("/replies/{itemInfoId}")
+    public ReplyListResponseDto findPagingReplyList(@PathVariable String itemInfoId,
+                                                    @PageableDefault(sort = "currentUpdate", direction = Sort.Direction.DESC, size = 10) Pageable pageable) {
+        return replyService.findPagingReplyList(itemInfoId, pageable);
     }
 
+    @GetMapping("/reply/{replyId}")
+    public ReplyResponseDto findReplyById(@PathVariable Long replyId) {
+        return replyService.findReplyById(replyId);
+    }
     @PostMapping("/reply")
     public Long saveReply(@RequestBody ReplySaveRequestDto requestDto) {
         return replyService.saveReply(requestDto);
