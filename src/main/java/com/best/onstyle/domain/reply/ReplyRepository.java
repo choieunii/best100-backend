@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 import java.util.Optional;
 
 public interface ReplyRepository extends JpaRepository<Reply,Long> {
-    Page<Reply> findAllByItemInfo(ItemInfo itemInfo, Pageable pageable);
+    Page<Reply> findAllByItemInfoOrderByCurrentUpdateDesc(ItemInfo itemInfo, Pageable pageable);
     Optional<Reply> findTopByItemInfoOrderByLikeCntDesc(ItemInfo itemInfo);
     Optional<Reply> findTopByItemInfoOrderByHateCntDesc(ItemInfo itemInfo);
 }
