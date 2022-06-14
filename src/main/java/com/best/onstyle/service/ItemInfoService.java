@@ -66,8 +66,8 @@ public class ItemInfoService {
         ItemInfo item = itemInfoRepository.findByItemInfoId(itemInfoId)
                 .orElseThrow(()->new IllegalArgumentException("해당 상품이 없습니다. id=" + itemInfoId));
 
-        item.setLikeCnt(item.getLikeCnt() + 1);
-        return itemInfoRepository.save(item).getId();
+        item.updateLikeCnt();
+        return itemInfoRepository.save(item).getLikeCnt();
     }
 
     private String getItemBestInfoFromOpenApi() {
@@ -158,6 +158,8 @@ public class ItemInfoService {
                 Price price = Price.builder()
                         .itemInfo(newItem.get())
                         .price(Long.valueOf(String.valueOf(rmItempriceInfo.get("salePrice"))))
+                        .discountRate(Long.valueOf(String.valueOf(rmItempriceInfo.get("discountRate"))))
+                        .customerPrice(Long.valueOf(String.valueOf(rmItempriceInfo.get("customerPrice"))))
                         .currentUpdate(new Date()).build();
 
                 Best best = Best.builder()

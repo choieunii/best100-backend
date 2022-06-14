@@ -9,12 +9,16 @@ import java.util.Date;
 public class BestItemPricesResponseDto {
     private Long id;
     private Long price;
+    private Long discountRate;
+    private Long customerPrice;
     private Date currentUpdate;
 
     @Builder
     public BestItemPricesResponseDto(Price price){
         this.id = price.getId();
         this.price = price.getPrice();
+        this.discountRate = price.getDiscountRate();
+        this.customerPrice = price.getCustomerPrice();
         this.currentUpdate = price.getCurrentUpdate();
     }
 }

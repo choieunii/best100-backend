@@ -30,13 +30,21 @@ public class Price {
     @Column(name = "price", nullable = false)
     private Long price;
 
+    @Column(name = "discount_rate", nullable = true)
+    private Long discountRate;
+
+    @Column(name = "customer_price", nullable = true)
+    private Long customerPrice;
+
     @Column(name = "current_update", nullable = false)
     private Date currentUpdate;
 
     @Builder
-    public Price(ItemInfo itemInfo, Long price, Date currentUpdate){
+    public Price(ItemInfo itemInfo, Long price, Long discountRate, Long customerPrice, Date currentUpdate){
         this.itemInfo = itemInfo;
         this.price = price;
+        this.discountRate = discountRate;
+        this.customerPrice = customerPrice;
         this.currentUpdate = currentUpdate;
     }
 }
