@@ -105,4 +105,9 @@ public class ItemInfo {
         this.cateName = basicItemInfoVO.getCategoryName();
         this.currentUpdate = currentUpdate;
     }
+
+    public void updateLikeCnt() {
+        if (this.likeCnt == null) this.likeCnt = Long.valueOf(1);
+        else this.likeCnt += 1;
+    }
 }

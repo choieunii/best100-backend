@@ -1,6 +1,7 @@
 package com.best.onstyle.dto;
 
 import com.best.onstyle.domain.itemInfo.ItemInfo;
+import com.best.onstyle.domain.price.Price;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -16,7 +17,8 @@ public class ItemResponseDto {
     private String middleCateName;
     private String cateName;
     private Long likeCnt;
-    private Long price;
+    private Long replyCnt;
+    private Price price;
 
     private boolean isCurrentUpdateBest;
     @Builder
@@ -31,7 +33,8 @@ public class ItemResponseDto {
         this.middleCateName = item.getMiddleCateName();
         this.cateName = item.getCateName();
         this.likeCnt = item.getLikeCnt();
-        this.price = item.getPriceList().get(0).getPrice();
+        this.replyCnt = Long.valueOf(item.getReplyList().size());
+        this.price = item.getPriceList().get(0);
         this.isCurrentUpdateBest = isCurrentUpdateBest;
     }
 }

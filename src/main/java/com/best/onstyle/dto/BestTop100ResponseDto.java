@@ -14,7 +14,7 @@ import java.util.List;
 public class BestTop100ResponseDto {
     private Long id;
     private String itemInfoId;
-    private Long ranking;
+    private List<Best> ranking;
     private String brandName;
     private String itemName;
     private String itemImgUrl;
@@ -25,13 +25,14 @@ public class BestTop100ResponseDto {
     private Long likeCnt;
     private ReplyResponseDto likeTopReply;
     private ReplyResponseDto hateTopReply;
+    private Long replyCnt;
     private List<Price> price;
 
     @Builder
     public BestTop100ResponseDto(Best best, ReplyResponseDto likeTopReply, ReplyResponseDto hateTopReply) {
         this.id = best.getId();
         this.itemInfoId = best.getItemInfo().getItemInfoId();
-        this.ranking = best.getRanking();
+        this.ranking = best.getItemInfo().getBestList();
         this.brandName = best.getItemInfo().getBrandName();
         this.itemName = best.getItemInfo().getItemName();
         this.itemImgUrl = best.getItemInfo().getItemImgUrl();
@@ -41,6 +42,7 @@ public class BestTop100ResponseDto {
         this.likeCnt = best.getItemInfo().getLikeCnt();
         this.likeTopReply = likeTopReply;
         this.hateTopReply = hateTopReply;
+        this.replyCnt = best.getCountOfReplies();
         this.price = best.getItemInfo().getPriceList();
     }
 }
