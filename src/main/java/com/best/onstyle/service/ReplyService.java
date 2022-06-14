@@ -5,10 +5,7 @@ import com.best.onstyle.domain.itemInfo.ItemInfo;
 import com.best.onstyle.domain.itemInfo.ItemInfoRepository;
 import com.best.onstyle.domain.reply.Reply;
 import com.best.onstyle.domain.reply.ReplyRepository;
-import com.best.onstyle.dto.ReplyResponseDto;
-import com.best.onstyle.dto.ReplySaveRequestDto;
-import com.best.onstyle.dto.ReplyTopResponseDto;
-import com.best.onstyle.dto.ReplyUpdateRequestDto;
+import com.best.onstyle.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -26,11 +24,14 @@ public class ReplyService {
     private final ItemInfoRepository itemInfoRepository;
 
     @Transactional
-    public Page<ReplyResponseDto> findPagingReplyList(String itemInfoId, Pageable pageable) {
+    public ReplyListResponseDto findPagingReplyList(String itemInfoId, Pageable pageable) {
         ItemInfo item = itemInfoRepository.findByItemInfoId(itemInfoId).get();
-        return replyRepository.findAllByItemInfo(item, pageable)
-                .map(ReplyResponseDto::new);
+        int totalReplyCnt = item.getReplyList().size();
+        List<ReplyResponseDto> replyList = replyRepository.findAllByItemInfoOrderByCurrentUpdateDesc(item, pageable)
+                .map(ReplyResponseDto::new).getContent();
+        return new ReplyListResponseDto(totalReplyCnt, replyList);
     }
+
     @Transactional
     public Long saveReply(ReplySaveRequestDto requestDto) {
         ItemInfo itemInfo = itemInfoRepository.findByItemInfoId(requestDto.getItemInfoId())
@@ -39,6 +40,12 @@ public class ReplyService {
         return replyRepository.save(requestDto.toSaveEntity(itemInfo)).getId();
     }
 
+    @Transactional(readOnly = true)
+    public ReplyResponseDto findReplyById(Long id) {
+        Reply reply = replyRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 한줄평이 없습니다. id=" + id));
+        return new ReplyResponseDto(reply);
+    }
     @Transactional
     public Long updateReply(Long id, ReplyUpdateRequestDto requestDto) {
         Reply reply = replyRepository.findById(id)
@@ -63,11 +70,17 @@ public class ReplyService {
     @Transactional
     public ReplyTopResponseDto findTopLikeCntAndHateCnt(String itemInfoId){
         ItemInfo item = itemInfoRepository.findByItemInfoId(itemInfoId).get();
-        ReplyResponseDto likeTopReply = replyRepository.findTopByItemInfoOrderByLikeCntDesc(item)
-                .map(ReplyResponseDto::new).get();
-        ReplyResponseDto hateTopReply = replyRepository.findTopByItemInfoOrderByHateCntDesc(item)
-                .map(ReplyResponseDto::new).get();
-        return new ReplyTopResponseDto(likeTopReply, hateTopReply);
+        Optional<ReplyResponseDto> likeTopReply = replyRepository.findTopByItemInfoOrderByLikeCntDesc(item)
+                .filter(r -> r.getLikeCnt() >= 1)
+                .map(ReplyResponseDto::new);
+        Optional<ReplyResponseDto> hateTopReply = replyRepository.findTopByItemInfoOrderByHateCntDesc(item)
+                .filter(r -> r.getHateCnt() >= 1)
+                .map(ReplyResponseDto::new);
+
+        ReplyResponseDto likeTopReplyResponseDto = likeTopReply.orElse(null);
+        ReplyResponseDto hateTopReplyResponseDto = hateTopReply.orElse(null);
+
+        return new ReplyTopResponseDto(likeTopReplyResponseDto, hateTopReplyResponseDto);
     }
 
     @Transactional
