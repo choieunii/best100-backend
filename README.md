@@ -1,10 +1,26 @@
-# best100-backend (정리중)
-### GET : /best/top100 - 초기 페이지 베스트 top 100
+# best100-backend 
 
-requestparam - sort: likeCnt, replyCnt
+Front end: [FE best100 Repository](https://github.com/choieunii/best100-frontend)
 
-sort param이 없을 경우 기본 랭킹 순 정렬
+```
+Front-end : Next.js, TypeScript, Nivo, CSS IN JS
+Back-end : Springboot, JPA, MySQL
+```
 
+### 개발 기간 
+2022-06-08 ~ 2022-06-17
+
+### 1. 초기 페이지 베스트 top 100
+```
+ GET : /best/top100 
+```
+
+* param : sort = ?, filter = ?
+* sort - likeCnt, replyCnt       
+* filter - increaseRank, decreaseRank, sale
+* sort param이 없을 경우 기본 랭킹 순 정렬
+
+### response
 ```jsx
 {
         "id": 2,
@@ -23,8 +39,35 @@ sort param이 없을 경우 기본 랭킹 순 정렬
     },
 ```
 
-### GET : /best/rankings/{ItemInfoId} - 현재까지의 랭킹 변동 사항
+### 2. 상품 세부정보 필터링
+```
+GET : /best/category
+```
+* param : categoryType = ?, categoryName = ?
+* categoryType - largeCategory, middleCategory, category, brandName      
+* categoryName - 선택한 카테고리 이름
 
+### 3. 5일치 같은 랭킹 필터링
+```
+GET : /best/ranking
+```
+* param : ranking = ?
+
+### 4. 최근 5일치 BEST 5 필터링
+```
+GET : /best/rankings/top5
+```
+### 5. 상품 검색
+```
+GET : /item/search
+```
+* param : itemName = ?
+
+### 6. 상품 별 랭킹 변동 사항 GET
+```
+GET : /best/rankings/{ItemInfoId}
+```
+### response
 ```jsx
 [
     {
@@ -40,10 +83,16 @@ sort param이 없을 경우 기본 랭킹 순 정렬
 ]
 ```
 
-### GET : /item/data - DB 데이터 
-
-### GET : /item/{itemInfoId} - 상품 코드에 다른 아이템 정보
-
+### 7. DB 데이터 저장
+* 외부 API 호출 후 필요한 데이터 저장
+```
+GET : /item/data
+```
+### 8. 상품 코드에 따라 아이템 정보 GET
+```
+GET : /item/{itemInfoId}
+```
+### response
 ```jsx
 {
     "id": 9,
@@ -61,10 +110,15 @@ sort param이 없을 경우 기본 랭킹 순 정렬
 }
 ```
 
-### POST : /item/like/{itemInfoId} - 아이템 좋아요
-
-### GET : /best/prices/{itemInfoId} - 아이템 최근 가격 리스트 출력
-
+### 9.  좋아요
+```
+POST : /item/like/{itemInfoId}
+```
+### 10. 상품 최근 가격 리스트 출력
+```
+GET : /best/prices/{itemInfoId}
+```
+### response
 ```jsx
 [
     {
@@ -80,10 +134,13 @@ sort param이 없을 경우 기본 랭킹 순 정렬
 ]
 ```
 
-### GET : /reply/{itemInfoId} → 기본 최신순 정렬 사이즈는 10
-
-queryparameter : sort = ?
-
+### 11. 댓글 리스트 출력 
+* 기본 최신순 정렬, 사이즈 5
+```
+GET : /reply/{itemInfoId}
+```
+* param : sort = ?, page = ?
+### response
 ```jsx
 [
     {
@@ -96,8 +153,12 @@ queryparameter : sort = ?
 ]
 ```
 
-### GET : /reply/top/{itemInfoId} → 1이상 일때만 처리 필요
-
+### 12. BEST 좋아요, 싫어요 GET 
+* 댓글의 좋아요, 싫어요 수가 1 이상 일때만 BEST로 등록
+```
+GET : /reply/top/{itemInfoId} 
+```
+### response
 ```jsx
 {
     "likeTopReply": {
@@ -117,18 +178,40 @@ queryparameter : sort = ?
 }
 ```
 
-### POST : /reply
+### 13. 댓글 등록
+```
+POST : /reply 
+```
+### request
+```
+{
+    "itemInfoId" : "123456",
+    "content" : "새로운 댓글",
+    "password" : "1234",
+    "hasPassword" : true
+}
+```
 
 
+### 14. 댓글 수정
+```
+PUT : /reply/{replyId}
+```
 
-### PUT : /reply/{replyId}
+* 비밀번호 불일치 시 error
 
 
-비밀번호 불일치시
-
-
-### DELETE : /reply/{replyId}
-
-### POST : /reply/like/{replyId}
-
-### POST : /reply/hate/{replyId}
+### 15. 댓글 삭제
+```
+POST : /reply/{replyId}
+```
+* 비밀번호 불일치 시 error
+ 
+### 16. 댓글 좋아요
+```
+POST : /reply/like/{replyId}
+```
+### 17. 댓글 싫어요
+```
+POST : /reply/hate/{replyId}
+```
