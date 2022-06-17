@@ -14,12 +14,15 @@ public class ReplyResponseDto {
     private Long hateCnt;
     private Date currentUpdate;
 
+    private boolean hasPassword;
+
     @Builder
     public ReplyResponseDto(Reply reply) {
         this.id = reply.getId();
         this.content = reply.getContent();
         this.likeCnt = reply.getLikeCnt();
         this.hateCnt = reply.getHateCnt();
+        this.hasPassword = reply.isHasPassword();
         this.currentUpdate = reply.getCurrentUpdate();
     }
 }

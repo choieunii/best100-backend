@@ -18,8 +18,9 @@ public class BestApiController {
     private final BestService bestService;
 
     @GetMapping("/best/top100")
-    public List<BestTop100ResponseDto> findBest(@RequestParam(required = false) String sort) {
-        return bestService.findBestTop100(Optional.ofNullable(sort));
+    public List<BestTop100ResponseDto> findBest(@RequestParam(required = false) String sort,
+                                                @RequestParam(required = false) String filter) {
+        return bestService.findBestTop100(Optional.ofNullable(sort), Optional.ofNullable(filter));
     }
 
     @GetMapping("/best/category")
@@ -32,9 +33,9 @@ public class BestApiController {
         return bestService.findBestByRanking(ranking);
     }
 
-    @GetMapping("/best/rankings/top3")
-    public List<BestTop100ResponseDto> findCurrent5DaysBestTop3(){
-        return bestService.findCurrent3DaysBestTop5();
+    @GetMapping("/best/rankings/top5")
+    public List<BestTop100ResponseDto> findCurrent3DaysBestTop5(){
+        return bestService.findCurrent5DaysBestTop5();
     }
 
     @GetMapping("/best/rankings/{itemInfoId}")

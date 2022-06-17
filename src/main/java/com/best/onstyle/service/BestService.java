@@ -27,61 +27,93 @@ public class BestService {
     private final ItemInfoRepository itemInfoRepository;
     private final BestRepository bestRepository;
     private final ReplyRepository replyRepository;
-    @Transactional
-    public List<BestTop100ResponseDto> findBestTop100(Optional<String> sortType) {
-        Date before = new Date();
-        before = new Date(before.getTime() + (1000 * 60 * 60 * 10 * -1));
 
+    @Transactional
+    public List<BestTop100ResponseDto> findBestTop100(Optional<String> sortType, Optional<String> filterType) {
+        // BEST TOP 100 정보 조회 및 필터링
         Sort sort = sortType.isPresent() ? getSortType(sortType.get()) : getSortType("ranking");
 
-        List<Best> bestTop100 = bestRepository.findAllByCurrentUpdateBetween(before, new Date(2022,06,14), sort);
+        List<Best> bestTop100 = bestRepository.findAllByCurrentUpdateBetween(getBeforeDate(1), new Date(), sort);
 
-        return bestTop100.stream().map(best -> getBestTop100ResponseDtoFromBest(best))
-                .collect(Collectors.toList());
+        if (filterType.isPresent()) {
+            return bestTop100.stream().filter(best -> {
+                // filter 값이 있다면, 랭킹 증가여부, 랭킹 감소 여부, 할인 여부에 따라 필터링한다.
+                        switch (filterType.get()) {
+                            case "increaseRank":
+                                return isIncreaseAndDecreaseRank(best, "increaseRank");
+                            case "decreaseRank":
+                                return isIncreaseAndDecreaseRank(best, "decreaseRank");
+                            case "sale":
+                                return best.getItemInfo().getPriceList().get(0).getDiscountRate() != 0;
+                            default:
+                                break;
+                        }
+                        return false;
+                    }).map(best -> getBestTop100ResponseDtoFromBest(best))
+                    .collect(Collectors.toList());
+        } else {
+            // 없을 경우 DTO에 넣어 return
+            return bestTop100.stream().map(best -> getBestTop100ResponseDtoFromBest(best))
+                    .collect(Collectors.toList());
+        }
     }
-    @Transactional
-    public List<BestTop100ResponseDto> findBestTop100ByCateName(String categoryType, String categoryName){
 
+    @Transactional
+    public List<BestTop100ResponseDto> findBestTop100ByCateName(String categoryType, String categoryName) {
+        // 상품 세부 정보 필터링
         List<Best> bestTop100 = bestRepository
                 .findAllByCurrentUpdateBetween(getBeforeDate(1), new Date(), getSortType("ranking"));
-
+        // category Type (대분류, 중분류, 소분류, 브랜드 명) 에 따라 필터링한다.
         Stream<Best> filteredTop100 = bestTop100.stream().filter(best -> {
             switch (categoryType) {
-                case "largeCategory": return best.getItemInfo().getLargeCateName().equals(categoryName);
-                case "middleCategory": return best.getItemInfo().getMiddleCateName().equals(categoryName);
-                case "category" : return best.getItemInfo().getCateName().equals(categoryName);
-                case "brandName" : return best.getItemInfo().getBrandName().equals(categoryName);
-                default: break;
+                case "largeCategory":
+                    return best.getItemInfo().getLargeCateName().equals(categoryName);
+                case "middleCategory":
+                    return best.getItemInfo().getMiddleCateName().equals(categoryName);
+                case "category":
+                    return best.getItemInfo().getCateName().equals(categoryName);
+                case "brandName":
+                    return best.getItemInfo().getBrandName().equals(categoryName);
+                default:
+                    break;
             }
             return false;
         });
 
-        return filteredTop100.map(best ->getBestTop100ResponseDtoFromBest(best))
+        return filteredTop100.map(best -> getBestTop100ResponseDtoFromBest(best))
                 .collect(Collectors.toList());
     }
 
+    private boolean isIncreaseAndDecreaseRank(Best best, String type) {
+        // BEST 100 필터링 시 랭킹 증가 감소 여부를 확인하는 메소드
+        List<Best> bestList = best.getItemInfo().getBestList();
+        if (bestList.size() < 2) return false;
+
+        Long beforeRanking = bestList.get(1).getRanking();
+        Long afterRanking = bestList.get(0).getRanking();
+
+        if (type.equals("increaseRank")) {
+            return afterRanking < beforeRanking;
+        } else if (type.equals("decreaseRank")) {
+            return afterRanking > beforeRanking;
+        }
+        return false;
+    }
+
     @Transactional
-    public List<BestByRankingResponseDto> findBestByRanking(Long ranking){
+    public List<BestByRankingResponseDto> findBestByRanking(Long ranking) {
+        // 랭킹 값을 받아와 최근 5일간 동일한 랭크에 위치한 상품을 반환
         List<Best> bestByRanking = bestRepository.findTop5ByRankingOrderByCurrentUpdateDesc(ranking);
         return bestByRanking.stream().map(best -> {
             BestTop100ResponseDto bestItemInfo = getBestTop100ResponseDtoFromBest(best);
             return new BestByRankingResponseDto(bestItemInfo, best);
         }).collect(Collectors.toList());
     }
+
     @Transactional
-    public List<BestTop100ResponseDto> findBestTop100ByBrandName(String brandName){
-
-        List<Best> bestTop100 = bestRepository
-                .findAllByCurrentUpdateBetween(getBeforeDate(1), new Date(), getSortType("ranking"));
-
-        Stream<Best> filteredTop100 = bestTop100.stream().filter(best ->best.getItemInfo().getBrandName().equals(brandName));
-
-        return filteredTop100.map(best ->getBestTop100ResponseDtoFromBest(best))
-                .collect(Collectors.toList());
-    }
-    @Transactional
-    public List<BestTop100ResponseDto> findCurrent3DaysBestTop5(){
-        List<Best> bestTop100 = bestRepository.findAllByCurrentUpdateBetweenAndRankingBetween(getBeforeDate(3), new Date(), Long.valueOf(1), Long.valueOf(5));
+    public List<BestTop100ResponseDto> findCurrent5DaysBestTop5() {
+        // 최근 5일간 BEST 5에 들었던 상품 반환
+        List<Best> bestTop100 = bestRepository.findAllByCurrentUpdateBetweenAndRankingBetween(getBeforeDate(5), new Date(), Long.valueOf(1), Long.valueOf(5));
         return bestTop100.stream()
                 .map(best -> getBestTop100ResponseDtoFromBest(best))
                 .collect(Collectors.toList());
@@ -89,6 +121,7 @@ public class BestService {
 
     @Transactional
     public List<BestItemRankingsResponseDto> findBestItemRankings(String itemInfoId) {
+        // 차트를 그리기 위한 랭킹 5일치 정보 반환
         ItemInfo itemInfo = itemInfoRepository.findByItemInfoId(itemInfoId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품이 없습니다." + itemInfoId));
 
@@ -97,7 +130,8 @@ public class BestService {
                 .collect(Collectors.toList());
     }
 
-    private BestTop100ResponseDto getBestTop100ResponseDtoFromBest(Best best){
+    private BestTop100ResponseDto getBestTop100ResponseDtoFromBest(Best best) {
+        //BEST 100에서 Reply 정보를 포함하여 DTO에 매핑하는 과정
         Optional<Reply> likeTopReply = replyRepository.findTopByItemInfoOrderByLikeCntDesc(best.getItemInfo());
         Optional<Reply> hateTopReply = replyRepository.findTopByItemInfoOrderByHateCntDesc(best.getItemInfo());
 
@@ -110,19 +144,19 @@ public class BestService {
         return new BestTop100ResponseDto(best, likeReplyResponseDto, hateReplyResponseDto);
     }
 
-    private Date getBeforeDate(int day){
+    private Date getBeforeDate(int day) {
         Date before = new Date();
-        before = new Date(before.getTime() + (1000 * 60 * 60 * 24 * -(day)));
+        before = new Date(before.getTime() + (1000 * 60 * 60 * 22 * -(day)));
         return before;
     }
 
-    private Sort getSortType(String sortType){
-        if(sortType.equals("replyCnt")){
+    private Sort getSortType(String sortType) {
+        if (sortType.equals("replyCnt")) {
             return Sort.by(Sort.Direction.DESC, "countOfReplies");
-        }else if(sortType.equals("likeCnt")){
+        } else if (sortType.equals("likeCnt")) {
             return Sort.by(Sort.Direction.DESC, "countOfItemLikes");
+        }else{
+            return Sort.by(Sort.Direction.ASC, "ranking");
         }
-        return Sort.by(Sort.Direction.ASC, "ranking");
     }
-
 }

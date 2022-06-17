@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface PriceRepository extends JpaRepository<Price,Long> {
     List<Price> findTop5ByItemInfoOrderByCurrentUpdateDesc(ItemInfo itemInfo);
+    List<Price> findAllByDiscountRateOrderByCurrentUpdateDesc(Long discountRate);
 }

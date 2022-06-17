@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ItemInfoRepository extends JpaRepository<ItemInfo,Long> {
-    List<ItemInfo> findAllByCurrentUpdate(Date currentUpdate);
-    Date findTopByOrderByCurrentUpdateDesc();
     Optional<ItemInfo> findByItemInfoId(String itemInfoId);
-
+    List<ItemInfo> findAllByItemNameContaining(String name);
 }

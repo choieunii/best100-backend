@@ -39,16 +39,19 @@ public class Reply {
     @Column(name = "password", nullable = true)
     private String password;
 
+    @Column(name = "has_password", nullable = true)
+    private boolean hasPassword;
     @Column(name = "current_update", nullable = false)
     private Date currentUpdate;
 
     @Builder
-    public Reply(ItemInfo itemInfo, String content, Long likeCnt, Long hateCnt, String password, Date currentUpdate) {
+    public Reply(ItemInfo itemInfo, String content, Long likeCnt, Long hateCnt, String password, Date currentUpdate, boolean hasPassword) {
         this.itemInfo = itemInfo;
         this.content = content;
         this.likeCnt = likeCnt;
         this.hateCnt = hateCnt;
         this.password = password;
+        this.hasPassword = hasPassword;
         this.currentUpdate = currentUpdate;
     }
 

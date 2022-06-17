@@ -18,7 +18,7 @@ public class ReplyApiController {
 
     @GetMapping("/replies/{itemInfoId}")
     public ReplyListResponseDto findPagingReplyList(@PathVariable String itemInfoId,
-                                                    @PageableDefault(sort = "currentUpdate", direction = Sort.Direction.DESC, size = 10) Pageable pageable) {
+                                                    @PageableDefault( direction = Sort.Direction.DESC, size = 5) Pageable pageable) {
         return replyService.findPagingReplyList(itemInfoId, pageable);
     }
 
@@ -36,9 +36,9 @@ public class ReplyApiController {
         return replyService.updateReply(replyId, requestDto);
     }
 
-    @DeleteMapping("/reply/{replyId}")
-    public boolean deleteReply(@PathVariable Long replyId) {
-        return replyService.deleteReply(replyId);
+    @PostMapping("/reply/{replyId}")
+    public boolean deleteReply(@PathVariable Long replyId, @RequestBody ReplyDeleteRequestDto requestDto) {
+        return replyService.deleteReply(replyId, requestDto);
     }
 
     @GetMapping("/reply/top/{itemInfoId}")

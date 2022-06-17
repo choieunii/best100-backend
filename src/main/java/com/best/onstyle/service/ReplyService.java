@@ -25,17 +25,23 @@ public class ReplyService {
 
     @Transactional
     public ReplyListResponseDto findPagingReplyList(String itemInfoId, Pageable pageable) {
+        // 더보기를 위해 pageable 사용, 댓글 리스트 조회
         ItemInfo item = itemInfoRepository.findByItemInfoId(itemInfoId).get();
         int totalReplyCnt = item.getReplyList().size();
-        List<ReplyResponseDto> replyList = replyRepository.findAllByItemInfoOrderByCurrentUpdateDesc(item, pageable)
+        List<ReplyResponseDto> replyList = replyRepository.findAllByItemInfo(item, pageable)
                 .map(ReplyResponseDto::new).getContent();
         return new ReplyListResponseDto(totalReplyCnt, replyList);
     }
 
     @Transactional
     public Long saveReply(ReplySaveRequestDto requestDto) {
+        //댓글 저장
         ItemInfo itemInfo = itemInfoRepository.findByItemInfoId(requestDto.getItemInfoId())
                 .orElseThrow(()->new IllegalArgumentException("해당 상품이 없습니다."));
+
+        if(requestDto.isHasPassword() && requestDto.getPassword() == ""){
+            throw new PasswordException("비밀번호를 입력해주세요.");
+        }
 
         return replyRepository.save(requestDto.toSaveEntity(itemInfo)).getId();
     }
@@ -48,11 +54,12 @@ public class ReplyService {
     }
     @Transactional
     public Long updateReply(Long id, ReplyUpdateRequestDto requestDto) {
+        //댓글 수정
         Reply reply = replyRepository.findById(id)
                 .orElseThrow(()->new IllegalArgumentException("해당 한줄평이 없습니다. id=" + id));
 
         if(!reply.getPassword().equals(requestDto.getPassword())){
-            throw new PasswordException();
+            throw new PasswordException("비밀번호가 일치하지 않습니다.");
         }
 
         reply.update(requestDto.getContent());
@@ -60,15 +67,22 @@ public class ReplyService {
     }
 
     @Transactional
-    public boolean deleteReply(Long id) {
+    public boolean deleteReply(Long id, ReplyDeleteRequestDto requestDto) {
+        //댓글 삭제
         Reply reply = replyRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 한줄평이 없습니다. id=" + id));
+
+        if(!reply.getPassword().equals(requestDto.getPassword())){
+            throw new PasswordException("비밀번호가 일치하지 않습니다.");
+        }
+
         replyRepository.delete(reply);
         return true;
     }
 
     @Transactional
     public ReplyTopResponseDto findTopLikeCntAndHateCnt(String itemInfoId){
+        // BEST 좋아요, BEST 싫어요 댓글 반환
         ItemInfo item = itemInfoRepository.findByItemInfoId(itemInfoId).get();
         Optional<ReplyResponseDto> likeTopReply = replyRepository.findTopByItemInfoOrderByLikeCntDesc(item)
                 .filter(r -> r.getLikeCnt() >= 1)
@@ -85,6 +99,7 @@ public class ReplyService {
 
     @Transactional
     public void updateReplyLikeCnt(Long id){
+        // 댓글 좋아요 증가
         Reply reply = replyRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 한줄평이 없습니다. id=" + id));
         reply.updateLikeCnt();
@@ -93,6 +108,7 @@ public class ReplyService {
 
     @Transactional
     public void updateReplyHateCnt(Long id){
+        // 댓글 싫어요 증가
         Reply reply = replyRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 한줄평이 없습니다. id=" + id));
         reply.updateHateCnt();
